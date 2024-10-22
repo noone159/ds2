@@ -1,0 +1,102 @@
+#include <iostream>
+
+using namespace std;
+
+const int WHITE = 0;
+const int GRAY = 1;
+const int BLACK = 2;
+
+struct Vertex {
+    int color;
+    int parent;
+    int discovery_time;
+    int finish_time;
+};
+
+struct Graph {
+    int numVertices;
+    int** adjMatrix;
+    Vertex* vertices;
+};
+
+int time_counter = 0;
+
+Graph createGraph(int numVertices) {
+    Graph graph;
+    graph.numVertices = numVertices;
+
+    graph.adjMatrix = new int*[numVertices];
+    for (int i = 0; i < numVertices; i++) {
+        graph.adjMatrix[i] = new int[numVertices];
+    }
+
+    graph.vertices = new Vertex[numVertices];
+    for (int i = 0; i < numVertices; ++i) {
+        graph.vertices[i].color = WHITE;
+        graph.vertices[i].parent = -1;
+        graph.vertices[i].discovery_time = 0;
+        graph.vertices[i].finish_time = 0;
+    }
+
+    return graph;
+}
+
+void DFSVisit(Graph& graph, int u) {
+    time_counter++;
+    graph.vertices[u].discovery_time = time_counter;
+    graph.vertices[u].color = GRAY;
+    cout << (u + 1) << " ";  
+    for (int v = 0; v < graph.numVertices; ++v) {
+        if (graph.adjMatrix[u][v] == 1 && graph.vertices[v].color == WHITE) {
+            graph.vertices[v].parent = u;
+            DFSVisit(graph, v);
+        }
+    }
+
+    time_counter++;
+    graph.vertices[u].finish_time = time_counter;
+    graph.vertices[u].color = BLACK;
+}
+
+void DFS(Graph& graph, int start_vertex) {
+       DFSVisit(graph, start_vertex);
+
+
+    for (int u = 0; u < graph.numVertices; ++u) {
+        if (graph.vertices[u].color == WHITE) {
+            DFSVisit(graph, u);
+        }
+    }
+}
+
+int main() {
+    int n;
+    cout << "Enter the number of vertices in graph: ";
+    cin >> n;
+
+    Graph graph = createGraph(n);
+
+    cout << "Enter the adjacency matrix:\n";
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            cin >> graph.adjMatrix[i][j];
+        }
+    }
+
+    int start_vertex;
+    cout << "Enter the starting vertex: ";
+    cin >> start_vertex;
+    start_vertex--;  
+    cout << "DFS Order: ";
+    DFS(graph, start_vertex);
+    cout << endl;
+
+
+    for (int i = 0; i < n; i++) {
+        delete[] graph.adjMatrix[i];
+    }
+    delete[] graph.adjMatrix;
+    delete[] graph.vertices;
+
+    return 0;
+}

@@ -1,0 +1,199 @@
+
+#include <iostream>
+using namespace std;
+
+struct Node{
+    int data;
+    Node* left;
+    Node* right;
+};
+
+Node* createNode(int data)
+{
+    Node* newNode = new Node();
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+
+
+Node* addBst(Node* root, Node* newNode)
+{
+    if (root == NULL) { 
+        root = newNode;
+        return newNode;
+    }
+
+    if (newNode->data < root->data) {
+        root->left = addBst(root->left, newNode);
+    }
+    else {
+        root->right = addBst(root->right, newNode);
+    }
+    return root;
+}
+
+bool deleteBst(Node*& root,int dltkey){
+    if(root == NULL){
+        return false;
+    }
+    if(dltkey < root->data){
+        return deleteBst(root->left,dltkey);
+    }else if(dltkey > root->data){
+        return deleteBst(root->right,dltkey);
+    }else {
+        if(root->left == NULL){
+            root = root -> right;
+            return true;
+        }else if(root->right == NULL){
+            root = root->left;
+            return true;
+        }else{
+            Node* largest = root->left;
+            while(largest->right != NULL){
+                
+                largest = largest->right;
+            }
+            root->data = largest->data;
+            return deleteBst(root->left,largest->data);
+        }
+    }
+}
+
+Node* searchBst(Node* root,int targetKey){
+    if(root == NULL){
+        return NULL;
+    }
+    if(targetKey < root->data){
+        return searchBst(root->left,targetKey);
+    }else if(targetKey > root->data){
+        return searchBst(root->right,targetKey);
+    }else{
+        return root;
+    }
+}
+
+Node* findLargestBst(Node* root){
+    if(root == NULL){
+        return NULL;
+    }
+    if(root -> right == NULL){
+        return root;
+    }
+    return findLargestBst(root->right);
+}
+Node* findSmallestBst(Node* root){
+    if(root == NULL){
+        return NULL;
+    }
+    if(root -> left == NULL){
+        return root;
+    }
+    return findSmallestBst(root->left);
+}
+
+
+void preOrder(Node* root){
+    if(root){
+        cout<<root->data<<" ";
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+}
+void inOrder(Node* root){
+    if(root){
+        inOrder(root->left);
+        cout<<root->data<<" ";
+        inOrder(root->right);
+    }
+}
+void postOrder(Node* root){
+    if(root){
+        postOrder(root->left);
+        postOrder(root->right);
+        cout<<root->data<<" ";
+    }
+}
+
+int main()
+{
+    Node* root = NULL;
+    Node* ans;
+    int choice,data;
+    Node* result;
+    
+    
+    while(true){
+        cout << "Menu:\n";
+cout << "1. Insert data\n";
+cout << "2. Delete data\n";
+cout << "3. Search\n";
+cout << "4. Find Largest\n";
+cout << "5. Find Smallest\n";
+cout << "6. PreOrder Traversal\n";
+cout << "7. Inorder Traversal\n";
+cout << "8. PostOrder Traversal\n";
+cout << "9. Exit\n";
+cout << "Enter your choice: ";
+cin >> choice;
+
+switch(choice){
+    case 1:
+    cout<<"Enter Data to insert:";
+    cin>>data;
+    // Node* newNode = createNode(data);
+    root = addBst(root,createNode(data));
+    cout<<data<<" is Inserted\n";
+    break;
+    case 2:
+    cout<<"Enter Data to Delete:";
+    cin>>data;
+    if(deleteBst(root,data)){
+    cout<<data<<" is Deleted\n";
+    }else{
+    cout<<"Not Found\n";
+    }
+    break;
+    case 3:
+    cout<<"Enter Data to Search:";
+    cin>>data;
+    result = searchBst(root,data);
+    if(result){
+        cout<<"Data Found\n";
+    }else{
+        cout<<"Data Not Found\n";
+    }
+    break;
+    case 4:
+    ans = findLargestBst(root);
+    cout<<ans->data<<" is Largest\n";
+    break;
+    case 5:
+    ans = findSmallestBst(root);
+    cout<<ans->data<<" is Smallest\n";
+    break;
+    case 6:
+    cout<<"PreOrder :";
+    preOrder(root);
+    cout<<endl;
+    break;
+    case 7:
+    cout<<"InOrder :";
+    inOrder(root);
+    cout<<endl;
+    break;
+    case 8:
+    cout<<"PostOrder :";
+    postOrder(root);
+    cout<<endl;
+    break;
+    case 9:
+    return 0;
+    default:
+    cout<<"Invalid Choice!";
+}
+    }
+    
+}

@@ -1,0 +1,80 @@
+#include <iostream>
+using namespace std;
+
+
+struct Node {
+    int p;   
+    int rank;
+};
+
+void makeSet(Node sets[], int x) {
+    sets[x].p = x; 
+    sets[x].rank = 0;   
+}
+
+int findSet(Node sets[], int x) {
+    if (x != sets[x].p) {
+        sets[x].p = findSet(sets, sets[x].p); 
+    }
+    return sets[x].p;
+}
+
+void unionSets(Node sets[], int x, int y) {
+    y = findSet(sets, y); 
+    x = findSet(sets, x);
+
+    if (x != y) { 
+        if (sets[x].rank > sets[y].rank) {
+            sets[y].p = x; 
+        } else {
+            sets[x].p = y; 
+            if (sets[x].rank == sets[y].rank) {
+                sets[y].rank++; 
+            }
+        }
+    }
+}
+
+int main() {
+     int n; 
+    cout<<"Enter size of the set:";
+    cin>>n;
+    Node sets[n]; 
+
+    for (int i = 1; i <= n; i++) {
+        makeSet(sets, i); 
+    }
+
+
+    int tofind;
+    int representative;
+    
+    int choice;
+    int pair1,pair2;
+while(true){
+cout<<"Menu:\n1.Union\n2.Find Set\n3.Exit\n";
+cout<<"Enter your choice:";
+cin>>choice;
+switch(choice){
+case 1:
+cout<<"Enter values to be union :";
+cin>>pair1;
+cin>>pair2;
+unionSets(sets,pair1,pair2);
+break;
+case 2:
+ cout<<"Enter data to find set :";
+cin>>tofind;
+     representative = findSet(sets, tofind);
+    cout << "Find-set("<<tofind<<") returns: " << representative << endl;
+break;
+case 3:
+return 0;
+default:
+cout<<"Invalid Choice! Try Again\n";
+}
+}
+   
+   
+    return 0;
+}

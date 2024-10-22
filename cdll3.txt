@@ -1,0 +1,366 @@
+#include <iostream>
+using namespace std;
+
+int MAX_SIZE = 100;
+
+struct Node {
+int data;
+Node* back;
+Node* fore;
+};
+ 
+struct CDLL {
+Node* head;
+Node* rear;
+int count;
+};
+ 
+void createList(CDLL& list) {
+list.head = NULL;
+list.rear = NULL;
+list.count = 0;
+}
+ 
+
+bool emptyCDLL(CDLL&);
+ 
+ 
+ 
+bool searchList( CDLL& list, Node*& pPre, Node*& pLoc, int target) {
+pPre = NULL;
+pLoc = list.head;
+if(list.count==0){
+    return false;
+} 
+if(pLoc->data == target){
+    return true;
+}
+if(target < pLoc->data){
+    return false;
+}
+pPre = pLoc;
+pLoc = pLoc->fore;
+
+while (pLoc != list.head && target > pLoc->data) {
+    pPre = pLoc;
+    pLoc = pLoc->fore;
+}
+
+ 
+if (pLoc == list.head) {
+return false;
+} else {
+if (target == pLoc->data) {
+return true;
+} else {
+return false;
+}
+}
+}
+
+ 
+int insertCDLL(CDLL& list, int dataIn) {
+if (list.count == MAX_SIZE) {
+return 0;
+}
+ 
+Node* predecessor = NULL;
+Node* successor = NULL;
+bool found = searchList(list, predecessor, successor, dataIn);
+ 
+if (!found) {
+Node* newNode = new Node;
+newNode->data = dataIn;
+
+ 
+if (predecessor == NULL) {
+    if(emptyCDLL(list)){
+        list.head = newNode;
+        list.rear = newNode;
+    }else{
+        list.head->back = newNode;
+        list.rear->fore = newNode;
+        list.head = newNode;
+    }
+newNode->back = list.rear;
+newNode->fore = list.head;
+
+} else {
+    
+newNode->fore = successor;
+newNode->back = predecessor;
+predecessor->fore = newNode;
+if (successor == list.head) {
+list.rear = newNode;
+}
+successor->back = newNode;
+
+}
+
+list.count++;
+return 1;
+
+} else {
+return 2;
+}
+
+}
+ 
+void deleteCDLL(CDLL& list, int target) {
+Node *predecessor = NULL;
+Node *deletenode = NULL;
+bool found = searchList(list, predecessor, deletenode, target);
+if(found) {
+if(list.count == 1) {
+list.head = NULL;
+list.rear = NULL;
+}
+else {
+if(predecessor != NULL) {
+predecessor->fore = deletenode->fore;
+deletenode->fore->back = predecessor;
+if(deletenode == list.rear) {
+list.rear = predecessor;
+}
+}
+else {
+list.head = deletenode->fore;
+deletenode->fore->back = deletenode->back;
+list.rear->fore = deletenode->fore;
+}
+}
+delete deletenode;
+list.count--;
+cout << "Element deleted." << endl;
+}
+else {
+cout << "Data not found." << endl;
+}
+}
+ 
+void displayHeadToRear( CDLL& list) {
+Node* pWalker = list.head;
+if(list.count == 1){
+    cout<<pWalker->data;
+}else{
+    
+ 
+if(pWalker != NULL){
+cout << pWalker->data << " -> ";
+pWalker = pWalker->fore;
+} 
+while (pWalker != list.rear) {
+cout << pWalker->data << " -> ";
+pWalker = pWalker->fore;
+}
+if(pWalker == list.rear){
+cout << pWalker->data;
+}
+ 
+}
+ 
+cout << endl;
+}
+ 
+void displayRearToHead( CDLL& list) {
+Node* pWalker = list.rear;
+if(list.count == 1){
+    cout<<pWalker->data;
+
+}else{
+    
+ if(pWalker != NULL){
+cout << pWalker->data << " <- ";
+pWalker = pWalker->back;
+ }
+ 
+while (pWalker != list.head) {
+cout << pWalker->data << " <- ";
+pWalker = pWalker->back;
+}
+if(pWalker == list.head){
+cout << pWalker->data;
+}
+}
+
+cout << endl;
+
+}
+ 
+
+
+ 
+void destroyCDLL(CDLL& list) {
+Node *temp = list.head;
+Node *temp1 = NULL;
+while(list.count != 0) {
+temp1 = temp;
+temp = temp->fore;
+delete temp1;
+list.count--;
+}
+list.head = NULL;
+list.rear = NULL;
+}
+
+int searchCDLLFromHead(CDLL& list, int target) {
+Node *pLoc = list.head;
+int pos = 1;
+if(list.head == NULL) {
+return -1;
+}
+if(target == pLoc->data) {
+return pos;
+}
+pLoc = pLoc->fore;
+pos++;
+while(pLoc != list.head && target > pLoc->data) {
+pLoc = pLoc->fore;
+pos++;
+}
+if(target == pLoc->data) {
+return pos;
+}
+else {
+return -1;
+}
+}
+
+int searchCDLLFromRear(CDLL& list, int target) {
+Node *pLoc = list.rear;
+int pos = 1;
+if(list.rear == NULL) {
+return -1;
+}
+if(target == pLoc->data) {
+return pos;
+}
+pLoc = pLoc->back;
+pos++;
+while(pLoc != list.head && target < pLoc->data) {
+pLoc = pLoc->back;
+pos++;
+}
+if(target == pLoc->data) {
+return pos;
+}
+else {
+return -1;
+}
+}
+
+bool emptyCDLL(CDLL& list){
+
+    if(list.count == 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+int cdllCount(CDLL& list){
+    return list.count;
+}
+
+int cdllCount(CDLL&);
+
+ 
+int main() {
+CDLL list;
+createList(list);
+ 
+int choice, data, result;
+bool done = false;
+ 
+while (true) {
+cout << "Menu:\n";
+cout << "1. Insert data\n";
+cout << "2. Delete data\n";
+cout << "3. Display from head to rear\n";
+cout << "4. Display from rear to head\n";
+cout << "5. Count the number of nodes\n";
+cout << "6. Search from head\n";
+cout << "7. Search from rear\n";
+cout << "8. Destroy\n";
+cout << "9. Exit\n";
+cout << "Enter your choice: ";
+cin >> choice;
+ 
+switch (choice) {
+case 1:
+cout << "Enter the data to insert: ";
+cin >> data;
+result = insertCDLL(list, data);
+if (result == 0) {
+cout << "Failed to insert data. List is full.\n";
+} else if (result == 1) {
+cout << "Data inserted successfully.\n";
+} else if (result == 2) {
+cout << "Failed to insert data. Duplicate key presented.\n";
+}
+break;
+case 2:
+if (emptyCDLL(list)) {
+cout << "List is empty.\n";
+} else {
+cout << "Enter the data to delete: ";
+cin >> data;
+deleteCDLL(list, data);
+
+}
+break;
+case 3:
+if (emptyCDLL(list)) {
+cout << "List is empty.\n";
+} else {
+displayHeadToRear(list);
+}
+break;
+case 4:
+if (emptyCDLL(list)) {
+cout << "List is empty.\n";
+} else {
+displayRearToHead(list);
+}
+break;
+case 5:
+result = cdllCount(list);
+if (result == 0) {
+cout << "List is empty.\n";
+} else {
+cout << "List Count " << result
+<< ".\n";
+}
+break;
+case 6:
+cout << "Enter the data to search from head: ";
+cin >> data;
+result = searchCDLLFromHead(list, data);
+if (result == -1) {
+cout << "Data not found in the list.\n";
+} else {
+cout << "Data found at position " << result << " from head.\n";
+}
+break;
+case 7:
+cout << "Enter the data to search from rear: ";
+cin >> data;
+result = searchCDLLFromRear(list, data);
+if (result == -1) {
+cout << "Data not found in the list.\n";
+} else {
+cout << "Data found at position " << result << " from rear.\n";
+}
+break;
+case 8:
+destroyCDLL(list);
+break;
+case 9:
+return 0;
+default:
+cout << "Invalid choice. Try again.\n";
+}
+
+}
+return 0;
+}
